@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  rag-api:
+    # Build the image using the Dockerfile in the current directory ('.').
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    # Map port 8000 on the host machine to port 8000 in the container.
+    ports:
+      - "8000:8000"
+    
+    # Use a named volume to persist the /app/models directory.
+    # This prevents the container from re-downloading the large LLM and embedding models 
+    # every time it is created or restarted.
+    volumes:
+      - rag_models:/app/models
+    
+    # Ensure the container attempts to restart if it stops (e.g., due to a crash).
+    restart: unless-stopped
+    
+    # Optional: If you encounter memory errors, you may need to increase the memory limit 
+    # depending on your host environment (TinyLlama/phi-2 are still memory-intensive).
+    # mem_limit: 8g 
+
+# Define the named volume.
+volumes:
+  rag_models:
+    driver: local
